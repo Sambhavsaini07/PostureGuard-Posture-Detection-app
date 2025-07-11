@@ -151,9 +151,13 @@ class PostureRules:
             left_knee = landmarks[mp_pose.PoseLandmark.LEFT_KNEE]
             right_knee = landmarks[mp_pose.PoseLandmark.RIGHT_KNEE]
             
-            # Calculate angles
-            neck_angle = PostureRules.calculate_neck_angle(nose, left_shoulder, left_hip)
-            back_angle = PostureRules.calculate_back_angle(left_shoulder, left_hip)
+             # Calculate angles with improved methods
+            neck_angle = PostureRules.calculate_neck_angle(
+                nose, left_ear, right_ear, left_shoulder, right_shoulder
+            )
+            back_angle = PostureRules.calculate_back_angle(
+                left_shoulder, right_shoulder, left_hip, right_hip
+            )
             
             # Calculate knee angle (using hip, knee, and ankle)
             left_ankle = landmarks[mp_pose.PoseLandmark.LEFT_ANKLE]
