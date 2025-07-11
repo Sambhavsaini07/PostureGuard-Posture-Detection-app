@@ -64,11 +64,7 @@
 ![Live Detection Screenshot](screenshot/image.png)
 
 ### 📊 Dashboard & Metrics
-![Dashboard Screenshot](screenshot/image2.png.png)
-
-> 📁 Place these images in a `screenshots/` folder in your project directory.
-
----
+![Dashboard Screenshot](screenshot/image2.png)
 
 ## ⚙️ Local Development Setup
 
