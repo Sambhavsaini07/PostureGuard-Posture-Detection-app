@@ -80,23 +80,56 @@ class PostureRules:
             return 0.0
     
     @staticmethod
-    def calculate_neck_angle(nose, shoulder, hip):
-        """Calculate neck forward angle"""
+    def calculate_neck_angle(nose, left_ear, right_ear, left_shoulder, right_shoulder):
+        """Calculate neck forward angle - improved version"""
         try:
-            # Calculate vertical line from shoulder
-            vertical_point = type('Point', (), {'x': shoulder.x, 'y': hip.y})()
-            return PostureRules.calculate_angle(nose, shoulder, vertical_point)
-        except:
+            # Calculate average ear position
+            avg_ear_x = (left_ear.x + right_ear.x) / 2
+            avg_ear_y = (left_ear.y + right_ear.y) / 2
+            
+            # Calculate average shoulder position
+            avg_shoulder_x = (left_shoulder.x + right_shoulder.x) / 2
+            avg_shoulder_y = (left_shoulder.y + right_shoulder.y) / 2
+            
+            # Calculate the angle between ear-shoulder line and vertical
+            # Vertical line goes downward from ear position
+            vertical_point = type('Point', (), {'x': avg_ear_x, 'y': avg_ear_y + 0.1})()
+            ear_point = type('Point', (), {'x': avg_ear_x, 'y': avg_ear_y})()
+            shoulder_point = type('Point', (), {'x': avg_shoulder_x, 'y': avg_shoulder_y})()
+            
+            # Calculate angle - this represents forward head posture
+            angle = PostureRules.calculate_angle(vertical_point, ear_point, shoulder_point)
+            
+            # Convert to a more intuitive measure (0 = perfect, higher = worse)
+            neck_forward_angle = abs(90 - angle)
+            
+            return neck_forward_angle
+        except Exception as e:
+            logger.error(f"Error calculating neck angle: {e}")
             return 0.0
     
     @staticmethod
-    def calculate_back_angle(shoulder, hip):
-        """Calculate back angle (should be close to 180 for straight back)"""
+    def calculate_back_angle(left_shoulder, right_shoulder, left_hip, right_hip):
+        """Calculate back angle (torso alignment)"""
         try:
-            # Use ear as reference point above shoulder
-            ear_point = type('Point', (), {'x': shoulder.x, 'y': shoulder.y - 0.1})()
-            return PostureRules.calculate_angle(ear_point, shoulder, hip)
-        except:
+            # Calculate average shoulder and hip positions
+            avg_shoulder_x = (left_shoulder.x + right_shoulder.x) / 2
+            avg_shoulder_y = (left_shoulder.y + right_shoulder.y) / 2
+            
+            avg_hip_x = (left_hip.x + right_hip.x) / 2
+            avg_hip_y = (left_hip.y + right_hip.y) / 2
+            
+            # Calculate angle between shoulder-hip line and vertical
+            vertical_point = type('Point', (), {'x': avg_shoulder_x, 'y': avg_shoulder_y - 0.1})()
+            shoulder_point = type('Point', (), {'x': avg_shoulder_x, 'y': avg_shoulder_y})()
+            hip_point = type('Point', (), {'x': avg_hip_x, 'y': avg_hip_y})()
+            
+            angle = PostureRules.calculate_angle(vertical_point, shoulder_point, hip_point)
+            
+            # For back angle, we want close to 180 degrees for straight posture
+            return angle
+        except Exception as e:
+            logger.error(f"Error calculating back angle: {e}")
             return 180.0
 
     @staticmethod
