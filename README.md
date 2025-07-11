@@ -9,6 +9,14 @@
 
 ---
 
+🌐 Live Deployment
+🚀 Try PostureGuard Now:
+
+Frontend (Vercel): https://posture-guard-posture-detection-app-sambhavs-projects-ae7009d8.vercel.app/
+Backend (Render): https://postureguard-posture-detection-app.onrender.com
+
+---
+
 ## 📖 Overview
 
 **PostureGuard** is an AI-powered real-time posture analysis tool that uses computer vision and pose estimation to evaluate sitting posture. It helps improve ergonomic health by providing instant feedback, personalized tracking, and detailed session insights.
