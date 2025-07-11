@@ -84,13 +84,15 @@ cd PostureGuard-Posture-Detection-app
 
 ---
 
-##🧑‍💻 Author
-Sambhav Saini
-🔗 GitHub
-📧 Email: sambhavsaini01@gmail.com 
+## 🧑‍💻 Author
+
+**Sambhav Saini**  
+📧 Email: [sambhavsaini01@gmail.com](mailto:sambhavsaini01@gmail.com)  
+🔗 GitHub: [@Sambhavsaini07](https://github.com/Sambhavsaini07)
 
 ---
 
-##📄 License
-This project is licensed under the MIT License.
-See the LICENSE file for full details.
+## 📄 License
+
+This project is licensed under the **MIT License**.  
+See the [LICENSE](LICENSE) file for full details.
