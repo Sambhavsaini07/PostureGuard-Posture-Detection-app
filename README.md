@@ -1,57 +1,79 @@
-PostureGuard 🎯
-Advanced AI-Powered Posture Detection & Analysis System
-Overview
-PostureGuard is a real-time posture analysis application that uses computer vision and machine learning to monitor and analyze your sitting posture. The system provides instant feedback, tracks posture metrics, and helps improve your ergonomic health.
-Features
+# 🧍‍♂️ PostureGuard 🎯  
+**Advanced AI-Powered Posture Detection & Analysis System**
 
-Real-time Posture Analysis: Live webcam feed analysis with instant feedback
-Video Upload Support: Analyze posture from uploaded video files
-Rule-based Logic: Intelligent posture evaluation based on neck angle, back straightness, and shoulder alignment
-Interactive Dashboard: Beautiful UI with real-time metrics and visualizations
-Session Statistics: Track your posture quality over time
-Pose Estimation: Visual skeleton overlay with joint detection
-Demo Mode: Works offline with simulated data when backend is unavailable
+[![React](https://img.shields.io/badge/Frontend-React-61DAFB?logo=react)](https://reactjs.org/)
+[![Tailwind](https://img.shields.io/badge/Styling-TailwindCSS-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
+[![MediaPipe](https://img.shields.io/badge/AI-MediaPipe-orange?logo=google)](https://google.github.io/mediapipe/)
+[![WebSocket](https://img.shields.io/badge/Realtime-WebSocket-blue)](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
 
-Tech Stack
-Frontend
+---
 
-React 18 - Modern JavaScript framework
-Tailwind CSS - Utility-first CSS framework
-Lucide React - Beautiful icon library
-HTML5 Canvas - For pose visualization
-WebRTC - Camera access and video streaming
-WebSocket - Real-time communication with backend
+## 📖 Overview
 
-Backend
+**PostureGuard** is an AI-powered real-time posture analysis tool that uses computer vision and pose estimation to evaluate sitting posture. It helps improve ergonomic health by providing instant feedback, personalized tracking, and detailed session insights.
 
-FastAPI - Modern Python web framework
-MediaPipe - Google's ML framework for pose detection
-OpenCV - Computer vision library
-NumPy - Numerical computing
-Uvicorn - ASGI server
-WebSocket - Real-time communication
-Pydantic - Data validation and serialization
+---
 
-AI/ML
+## 🚀 Features
 
-MediaPipe Pose - Human pose estimation
-Rule-based Analysis - Custom posture evaluation logic
-Computer Vision - Image processing and analysis
+- ✅ **Live Webcam Analysis** – Detects posture in real-time  
+- 📹 **Video Upload Support** – Analyze previously recorded footage  
+- 📐 **Rule-Based Evaluation** – Uses angles and alignment for posture scoring  
+- 📊 **Interactive Dashboard** – Live feedback with posture score, alerts, and tips  
+- 🧍 **Pose Skeleton Overlay** – Real-time joint visualization  
+- 📈 **Session Statistics** – Tracks historical posture metrics  
+- 🌐 **Demo Mode** – Simulates data without active backend
 
+---
 
-Deployment
-Option 1: Local Development
+## 🧰 Tech Stack
 
-Start Backend
-bashcd backend
-python main.py
+### 💻 Frontend
 
-Start Frontend (in new terminal)
-bashcd frontend
-npm start
+- **React 18** – Modern JavaScript library
+- **Tailwind CSS** – Utility-first styling framework
+- **Lucide React** – Icon system
+- **HTML5 Canvas** – Pose visualization
+- **WebRTC** – Webcam integration
+- **WebSocket** – Live frontend-backend sync
 
-Access Application
+### 🔧 Backend
 
-Frontend: http://localhost:3000
-Backend API: http://localhost:8000
-API Documentation: http://localhost:8000/docs
+- **FastAPI** – Python web framework for APIs
+- **MediaPipe** – Pose estimation by Google
+- **OpenCV** – Computer vision processing
+- **NumPy** – Mathematical computations
+- **Uvicorn** – ASGI server
+- **Pydantic** – Type-safe data validation
+
+### 🤖 AI/ML
+
+- **MediaPipe Pose** – Landmark detection and skeleton tracking
+- **Custom Rule-Based Logic** – Calculates posture scores based on:
+  - Neck angle
+  - Shoulder alignment
+  - Back straightness
+- **Computer Vision** – Frame-level image processing
+
+---
+
+## 🖼️ Demo & Screenshots
+
+### 📸 Live Posture Detection
+![Live Detection Screenshot](screenshot/image.png)
+
+### 📊 Dashboard & Metrics
+![Dashboard Screenshot](screenshot/image2.png.png)
+
+> 📁 Place these images in a `screenshots/` folder in your project directory.
+
+---
+
+## ⚙️ Local Development Setup
+
+### 🔹 1. Clone the Repo
+
+```bash
+git clone https://github.com/Sambhavsaini07/PostureGuard-Posture-Detection-app.git
+cd PostureGuard-Posture-Detection-app
