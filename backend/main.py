@@ -81,29 +81,32 @@ class PostureRules:
     
     @staticmethod
     def calculate_neck_angle(nose, left_ear, right_ear, left_shoulder, right_shoulder):
-        """Calculate neck forward angle - improved version"""
+        """Calculate neck forward angle - corrected version"""
         try:
-            # Calculate average ear position
-            avg_ear_x = (left_ear.x + right_ear.x) / 2
-            avg_ear_y = (left_ear.y + right_ear.y) / 2
-            
-            # Calculate average shoulder position
+            # Calculate average shoulder position (represents torso reference)
             avg_shoulder_x = (left_shoulder.x + right_shoulder.x) / 2
             avg_shoulder_y = (left_shoulder.y + right_shoulder.y) / 2
-            
-            # Calculate the angle between ear-shoulder line and vertical
-            # Vertical line goes downward from ear position
-            vertical_point = type('Point', (), {'x': avg_ear_x, 'y': avg_ear_y + 0.1})()
-            ear_point = type('Point', (), {'x': avg_ear_x, 'y': avg_ear_y})()
-            shoulder_point = type('Point', (), {'x': avg_shoulder_x, 'y': avg_shoulder_y})()
-            
-            # Calculate angle - this represents forward head posture
-            angle = PostureRules.calculate_angle(vertical_point, ear_point, shoulder_point)
-            
-            # Convert to a more intuitive measure (0 = perfect, higher = worse)
-            neck_forward_angle = abs(90 - angle)
-            
-            return neck_forward_angle
+        
+            # Use nose position as head reference point
+            head_x = nose.x
+            head_y = nose.y
+        
+            # Calculate horizontal offset of head from shoulder line
+            horizontal_offset = abs(head_x - avg_shoulder_x)
+        
+            # Calculate vertical distance from nose to shoulder level
+            vertical_distance = abs(head_y - avg_shoulder_y)
+        
+            # Avoid division by zero
+            if vertical_distance == 0:
+                return 0.0
+        
+            # Calculate forward head angle using trigonometry
+            # tan(angle) = horizontal_offset / vertical_distance
+            neck_angle = math.atan(horizontal_offset / vertical_distance) * 180 / math.pi
+        
+            return neck_angle
+        
         except Exception as e:
             logger.error(f"Error calculating neck angle: {e}")
             return 0.0
