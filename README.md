@@ -61,10 +61,10 @@
 ## 🖼️ Demo & Screenshots
 
 ### 📸 Live Posture Detection
-![Live Detection Screenshot](screenshot/image.png)
+![Live Detection Screenshot](screenshot\Screenshot 2025-07-11 185629.png)
 
 ### 📊 Dashboard & Metrics
-![Dashboard Screenshot](screenshot/image2.png)
+![Dashboard Screenshot](screenshot/Screenshot 2025-07-11 185151.png)
 
 ## ⚙️ Local Development Setup
 
