@@ -81,7 +81,7 @@ Backend (Render): https://postureguard-posture-detection-app.onrender.com
 ```bash
 git clone https://github.com/Sambhavsaini07/PostureGuard-Posture-Detection-app.git
 cd PostureGuard-Posture-Detection-app
-
+```
 ---
 
 ## 🧑‍💻 Author
