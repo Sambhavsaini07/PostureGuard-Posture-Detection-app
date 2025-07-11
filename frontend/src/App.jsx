@@ -30,7 +30,12 @@ const PostureDetectionApp = () => {
   // WebSocket connection for real-time communication with backend
   const connectWebSocket = useCallback(() => {
     try {
-      wsRef.current = new WebSocket('wss://postureguard-posture-detection-app.onrender.com/ws');
+      // Use the deployed backend URL with secure WebSocket
+    const wsUrl = process.env.NODE_ENV === 'production' 
+      ? 'wss://postureguard-posture-detection-app.onrender.com/ws'
+      : 'ws://localhost:8000/ws';
+    
+    wsRef.current = new WebSocket(wsUrl);
       
       wsRef.current.onopen = () => {
         setIsConnected(true);
@@ -166,7 +171,7 @@ const PostureDetectionApp = () => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
         type: 'analyze_frame',
-        image: imageData,
+        frame: imageData,  // Match the expected format from backend
         timestamp: Date.now()
       }));
     }
