@@ -213,7 +213,13 @@ async def websocket_endpoint(websocket: WebSocket):
             frame_data = json.loads(data)
             
             # Process frame
-            analysis = process_frame(frame_data["frame"])
+            if "frame" in frame_data:
+                analysis = process_frame(frame_data["frame"])
+            elif "image" in frame_data:  # Alternative format
+                analysis = process_frame(frame_data["image"])
+            else:
+                logger.error("No frame data found in message")
+                continue
             
             if analysis:
                 # Send analysis back to client
