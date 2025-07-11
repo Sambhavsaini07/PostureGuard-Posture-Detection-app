@@ -14,6 +14,7 @@ const PostureDetectionApp = () => {
   const [postureHistory, setPostureHistory] = useState([]);
   const [videoFile, setVideoFile] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState('Demo Mode');
   const [sessionStats, setSessionStats] = useState({
     totalFrames: 0,
     goodPostures: 0,
@@ -26,41 +27,72 @@ const PostureDetectionApp = () => {
   const streamRef = useRef(null);
   const wsRef = useRef(null);
   const analysisIntervalRef = useRef(null);
+  const reconnectTimeoutRef = useRef(null);
 
   // WebSocket connection for real-time communication with backend
   const connectWebSocket = useCallback(() => {
     try {
+      // Clear any existing reconnection timeout
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+
+      setConnectionStatus('Connecting...');
+      
       // Use the deployed backend URL with secure WebSocket
-    const wsUrl = process.env.NODE_ENV === 'production' 
-      ? 'wss://postureguard-posture-detection-app.onrender.com/ws'
-      : 'ws://localhost:8000/ws';
-    
-    wsRef.current = new WebSocket(wsUrl);
+      const wsUrl = process.env.NODE_ENV === 'production' 
+        ? 'wss://postureguard-posture-detection-app.onrender.com/ws'
+        : 'ws://localhost:8000/ws';
+      
+      console.log('Connecting to WebSocket:', wsUrl);
+      wsRef.current = new WebSocket(wsUrl);
       
       wsRef.current.onopen = () => {
         setIsConnected(true);
+        setConnectionStatus('Connected');
         console.log('Connected to backend WebSocket');
       };
 
       wsRef.current.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.type === 'posture_analysis') {
-          updatePostureAnalysis(data.analysis);
+        try {
+          const data = JSON.parse(event.data);
+          console.log('Received message:', data);
+          
+          if (data.type === 'posture_analysis' && data.analysis) {
+            updatePostureAnalysis(data.analysis);
+          }
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
         }
       };
 
-      wsRef.current.onclose = () => {
+      wsRef.current.onclose = (event) => {
         setIsConnected(false);
-        console.log('Disconnected from backend');
+        setConnectionStatus('Disconnected');
+        console.log('WebSocket closed:', event.code, event.reason);
+        
+        // Attempt to reconnect after 3 seconds
+        if (event.code !== 1000) { // Not a normal closure
+          reconnectTimeoutRef.current = setTimeout(() => {
+            console.log('Attempting to reconnect...');
+            connectWebSocket();
+          }, 3000);
+        }
       };
 
       wsRef.current.onerror = (error) => {
         console.error('WebSocket error:', error);
         setIsConnected(false);
+        setConnectionStatus('Error - Starting demo mode');
+        
+        // Start demo mode as fallback
+        setTimeout(() => {
+          startDemoMode();
+        }, 1000);
       };
     } catch (error) {
       console.error('Failed to connect to backend:', error);
-      // Fallback to demo mode
+      setConnectionStatus('Failed - Demo mode');
       startDemoMode();
     }
   }, []);
@@ -68,9 +100,13 @@ const PostureDetectionApp = () => {
   // Initialize WebSocket connection
   useEffect(() => {
     connectWebSocket();
+    
     return () => {
       if (wsRef.current) {
         wsRef.current.close();
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
       }
     };
   }, [connectWebSocket]);
@@ -79,13 +115,18 @@ const PostureDetectionApp = () => {
   const startWebcam = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 640, height: 480, facingMode: 'user' }
+        video: { 
+          width: 640, 
+          height: 480, 
+          facingMode: 'user' 
+        }
       });
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
         setIsWebcamActive(true);
+        console.log('Webcam started successfully');
       }
     } catch (error) {
       console.error('Error accessing webcam:', error);
@@ -106,6 +147,7 @@ const PostureDetectionApp = () => {
     if (isAnalyzing) {
       stopAnalysis();
     }
+    console.log('Webcam stopped');
   };
 
   // Handle video file upload
@@ -118,6 +160,7 @@ const PostureDetectionApp = () => {
         videoRef.current.load();
       }
       setVideoFile(file);
+      console.log('Video file uploaded:', file.name);
     }
   };
 
@@ -129,14 +172,16 @@ const PostureDetectionApp = () => {
     }
 
     setIsAnalyzing(true);
+    console.log('Starting posture analysis');
     
     // Start sending frames to backend for analysis
-    if (isConnected && wsRef.current) {
+    if (isConnected && wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      console.log('Starting real-time analysis with backend');
       analysisIntervalRef.current = setInterval(() => {
         captureAndSendFrame();
-      }, 200); // Send frame every 200ms
+      }, 500); // Send frame every 500ms for better performance
     } else {
-      // Fallback to demo mode
+      console.log('Backend not connected, starting demo mode');
       startDemoMode();
     }
   };
@@ -148,15 +193,25 @@ const PostureDetectionApp = () => {
       clearInterval(analysisIntervalRef.current);
       analysisIntervalRef.current = null;
     }
+    console.log('Posture analysis stopped');
   };
 
   // Capture frame and send to backend
   const captureAndSendFrame = () => {
-    if (!videoRef.current || !canvasRef.current) return;
+    if (!videoRef.current || !canvasRef.current) {
+      console.log('Video or canvas not available');
+      return;
+    }
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     const video = videoRef.current;
+
+    // Check if video is ready
+    if (video.readyState < 2) {
+      console.log('Video not ready');
+      return;
+    }
 
     // Set canvas size
     canvas.width = video.videoWidth || 640;
@@ -166,19 +221,27 @@ const PostureDetectionApp = () => {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     // Convert canvas to base64 and send to backend
-    const imageData = canvas.toDataURL('image/jpeg', 0.8);
+    const imageData = canvas.toDataURL('image/jpeg', 0.7);
     
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({
+      const message = {
         type: 'analyze_frame',
-        frame: imageData,  // Match the expected format from backend
+        frame: imageData,
         timestamp: Date.now()
-      }));
+      };
+      
+      wsRef.current.send(JSON.stringify(message));
+      console.log('Frame sent to backend');
+    } else {
+      console.log('WebSocket not ready, state:', wsRef.current?.readyState);
     }
   };
 
   // Demo mode for when backend is not available
   const startDemoMode = () => {
+    console.log('Starting demo mode');
+    setConnectionStatus('Demo Mode Active');
+    
     if (analysisIntervalRef.current) {
       clearInterval(analysisIntervalRef.current);
     }
@@ -251,6 +314,7 @@ const PostureDetectionApp = () => {
   // Update posture analysis
   const updatePostureAnalysis = (analysis) => {
     setCurrentPosture(analysis);
+    console.log('Posture updated:', analysis.status, 'Score:', analysis.score);
     
     // Update history
     setPostureHistory(prev => {
@@ -348,6 +412,30 @@ const PostureDetectionApp = () => {
     }
   };
 
+  // Get connection status color
+  const getConnectionStatusColor = () => {
+    if (isConnected) return 'bg-green-100 text-green-700';
+    if (connectionStatus.includes('Demo')) return 'bg-blue-100 text-blue-700';
+    return 'bg-red-100 text-red-700';
+  };
+
+  // Export session data
+  const exportData = () => {
+    const data = {
+      sessionStats,
+      postureHistory,
+      exportTime: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `posture_session_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 p-4">
       <div className="max-w-7xl mx-auto">
@@ -360,11 +448,9 @@ const PostureDetectionApp = () => {
             Advanced AI-Powered Posture Detection & Analysis System
           </p>
           <div className="flex items-center justify-center mt-4 space-x-4">
-            <div className={`flex items-center space-x-2 px-3 py-1 rounded-full ${isConnected ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+            <div className={`flex items-center space-x-2 px-3 py-1 rounded-full ${getConnectionStatusColor()}`}>
               <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-              <span className="text-sm font-medium">
-                {isConnected ? 'Backend Connected' : 'Demo Mode'}
-              </span>
+              <span className="text-sm font-medium">{connectionStatus}</span>
             </div>
           </div>
         </div>
@@ -600,7 +686,10 @@ const PostureDetectionApp = () => {
                     Math.round(postureHistory.reduce((sum, entry) => sum + entry.score, 0) / postureHistory.length) : 0
                   }/100
                 </span>
-                <button className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                <button 
+                  onClick={exportData}
+                  className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
                   <Download className="w-4 h-4" />
                   <span>Export Data</span>
                 </button>
