@@ -25,7 +25,10 @@ app = FastAPI(title="PostureGuard Backend", version="1.0.0")
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://posture-guard-posture-detection-ky6ao0j89.vercel.app",
+        "http://localhost:3000",  # For local development
+        "https://localhost:3000"  # For local HTTPS development
+        ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

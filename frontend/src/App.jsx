@@ -30,7 +30,7 @@ const PostureDetectionApp = () => {
   // WebSocket connection for real-time communication with backend
   const connectWebSocket = useCallback(() => {
     try {
-      wsRef.current = new WebSocket('ws://localhost:8000/ws');
+      wsRef.current = new WebSocket('wss://postureguard-posture-detection-app.onrender.com/ws');
       
       wsRef.current.onopen = () => {
         setIsConnected(true);
