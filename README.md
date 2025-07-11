@@ -82,13 +82,15 @@ Backend (Render): https://postureguard-posture-detection-app.onrender.com
 git clone https://github.com/Sambhavsaini07/PostureGuard-Posture-Detection-app.git
 cd PostureGuard-Posture-Detection-app
 
+---
 
-🧑‍💻 Author
+##🧑‍💻 Author
 Sambhav Saini
 🔗 GitHub
 📧 Email: sambhavsaini01@gmail.com 
 
+---
 
-📄 License
+##📄 License
 This project is licensed under the MIT License.
 See the LICENSE file for full details.
